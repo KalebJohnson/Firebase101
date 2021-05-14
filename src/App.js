@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import './App.css';
 import { SignIn, SignOut } from './comps/SignIn'
 import { Button, Input, } from 'antd';
+import { useSpring, animated} from '@react-spring/web';
 import 'antd/dist/antd.css';
 // firebase imports for auth and the general DB
 import firebase from 'firebase/app';
@@ -43,7 +44,7 @@ function App() {
 
 
 function ChatRoom() {
-  
+
 
   // reference a collection in the db ( in this case the messages so I can grab the documents from it )
   const dummy = useRef();
@@ -83,7 +84,12 @@ function ChatRoom() {
   return (<>
     <main>
 
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+      {messages && messages.map(msg => 
+          <ChatMessage 
+            key={msg.id} 
+            message={msg}
+            />
+            )}
 
       <span ref={dummy}></span>
 
@@ -101,7 +107,7 @@ function ChatRoom() {
           placeholder="say something nice"
           style={{width:'100%'}}
         />
-        <Button type="submit" disabled={!formValue} onClick={sendMessage}>Send</Button>
+        <Button style={{ height:"90%" }} type="submit" disabled={!formValue} onClick={sendMessage}>Send</Button>
 
       </form>
 
@@ -110,6 +116,24 @@ function ChatRoom() {
 
 
 function ChatMessage(props) {
+
+  const [hovered, setHovered] = useState(false)
+  const [hoveredPic, setHoveredPic] = useState(false)
+  const ani = useSpring({
+    config: { mass:0.5, tension:20, friction:8 },
+    marginRight: hovered ? "1.5rem" : "1rem",
+  })
+
+  const ani2 = useSpring({
+    config: { mass:1, tension:20, friction:8 },
+    marginLeft: hovered ? "1.5rem" : "1rem",
+  })
+
+  const profile = useSpring({
+    config: { mass:1, tension:20, friction:8 },
+    width: hoveredPic ? "50px" : "40px",
+    height: hoveredPic ? "50px" : "40px",
+  })
   // some object destructuringgggggggggg
   const { text, uid, photoURL } = props.message;
   console.log(props)
@@ -119,9 +143,20 @@ function ChatMessage(props) {
 
   // assign style on sent or recieved  string value then just rendering some db info for the messages
   return (<>
-    <div className={`message ${messageClass}`}>
-      <img src={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'} />
-      <p>{text}</p>
+    <div className={`message ${messageClass}`} >
+      <animated.img 
+        style={profile}
+        src={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'}
+        onPointerOver={() => setHoveredPic(true)}
+        onPointerOut={() => setHoveredPic(false)}
+        />
+      <animated.p
+      style={messageClass === 'sent' ? ani : ani2}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)} 
+      >
+      {text}
+      </animated.p>
     </div>
   </>)
 }
