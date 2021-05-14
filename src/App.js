@@ -125,12 +125,12 @@ function ChatMessage(props) {
   })
 
   const ani2 = useSpring({
-    config: { mass:1, tension:20, friction:8 },
+    config: { mass:0.5, tension:20, friction:8 },
     marginLeft: hovered ? "1.5rem" : "1rem",
   })
 
   const profile = useSpring({
-    config: { mass:1, tension:20, friction:8 },
+    config: { mass:0.5, tension:20, friction:8 },
     width: hoveredPic ? "50px" : "40px",
     height: hoveredPic ? "50px" : "40px",
   })
